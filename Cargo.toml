@@ -1,0 +1,22 @@
+[package]
+name = "flow_gate_bench"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "flow-gate-bench"
+path = "src/main.rs"
+
+[lib]
+name = "flow_gate_bench"
+path = "src/lib.rs"
+
+[dependencies]
+axum = { version = "0.8", features = ["macros"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "sync", "fs"] }
+rusqlite = { version = "0.32", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+opt-level = 2

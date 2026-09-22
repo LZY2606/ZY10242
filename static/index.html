@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>流式门谱台</title>
+<link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+<header>
+  <h1>流式门谱台</h1>
+  <div class="meta">
+    <span id="fixture-meta"></span>
+    <span>
+      补偿矩阵：<select id="comp-select" title="补偿矩阵版本"></select>
+      <button id="comp-apply" class="small">切换并重放</button>
+    </span>
+    <span>
+      变换版本：<select id="transform-select" title="变换版本"></select>
+      <button id="transform-apply" class="small">切换并重放</button>
+    </span>
+    <a class="btn" href="/api/export" download>导出运行记录</a>
+    <button id="reseed-btn" class="small">恢复固定 fixture</button>
+    <label class="btn">
+      清空并导入复核
+      <input id="import-file" type="file" accept="application/json,.json" hidden />
+    </label>
+  </div>
+</header>
+
+<main>
+  <section class="panel" id="tree-panel">
+    <h2>门系树与计数</h2>
+    <div class="hint">父群为空时百分比显示“不可定义”；旧子门运行在父门修改后标记为“失效”。</div>
+    <div id="tree"></div>
+    <div id="verify"></div>
+  </section>
+
+  <section class="panel wide">
+    <h2>双通道投影与多边形门</h2>
+    <div class="controls">
+      <label>群体 <select id="pop-select"></select></label>
+      <label>X 通道 <select id="x-select"></select></label>
+      <label>Y 通道 <select id="y-select"></select></label>
+      <label><input type="checkbox" id="show-current" checked /> 当前运行空间</label>
+      <span id="scatter-space" class="space"></span>
+    </div>
+    <canvas id="scatter" width="720" height="520"></canvas>
+    <div class="controls">
+      <span class="hint">点击画布可追加顶点（像素坐标自动换算到 0–1000 刻度）；顶点表可直接修正，半开几何保证共享边不双计。</span>
+    </div>
+    <div id="vertex-editor">
+      <table id="vertex-table">
+        <thead><tr><th>#</th><th>X</th><th>Y</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="controls">
+        <button id="add-vertex">追加顶点</button>
+        <button id="reset-vertices">重置为当前门</button>
+        <input id="gate-note" placeholder="本次门修正说明，例如：收紧 T 门上缘" />
+        <button id="save-gate" class="primary">保存为新门版本并重放</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel wide">
+    <h2>直方分布</h2>
+    <div class="controls">
+      <label>通道 <select id="hist-channel"></select></label>
+      <label>分箱 <input id="hist-bins" type="number" min="5" max="100" value="25" style="width:5em" /></label>
+      <span id="hist-space" class="space"></span>
+    </div>
+    <canvas id="histogram" width="720" height="220"></canvas>
+  </section>
+
+  <section class="panel wide">
+    <h2>分支差异（按事件身份）</h2>
+    <div class="controls">
+      <label>分支 A <select id="diff-a"></select></label>
+      <label>分支 B <select id="diff-b"></select></label>
+      <button id="diff-run">比较进出差异</button>
+    </div>
+    <div id="diff-summary" class="hint"></div>
+    <div class="table-wrap">
+      <table id="diff-table">
+        <thead><tr><th>事件身份</th><th>仪器批次</th><th>类别</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<div id="toast"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
