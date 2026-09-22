@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>流式门谱台</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>流式门谱台</h1>
+  <div class="meta">
+    <span id="event-meta"></span>
+    <span id="batch-meta"></span>
+    <span>活动补偿：<b id="active-comp"></b></span>
+    <span>活动变换：<b id="active-trans"></b></span>
+  </div>
+</header>
+
+<main>
+  <section class="panel" id="tree-panel">
+    <h2>门系树 · 事件数 · 父子百分比</h2>
+    <div id="tree"></div>
+    <h3>运行历史（保留失效/被取代记录）</h3>
+    <div id="run-history"></div>
+  </section>
+
+  <section class="panel" id="plot-panel">
+    <h2>双通道投影</h2>
+    <div class="controls">
+      <label>X <select id="sel-x"></select></label>
+      <label>Y <select id="sel-y"></select></label>
+      <label>叠加门
+        <select id="sel-gate"></select>
+      </label>
+    </div>
+    <canvas id="plot" width="620" height="520"></canvas>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <section class="panel" id="hist-panel">
+    <h2>直方分布</h2>
+    <label>通道 <select id="sel-hist"></select></label>
+    <canvas id="hist" width="620" height="220"></canvas>
+  </section>
+
+  <section class="panel" id="version-panel">
+    <h2>版本与变换</h2>
+    <div class="grid2">
+      <div>
+        <h3>补偿矩阵版本</h3>
+        <div id="comp-list"></div>
+        <details><summary>新建补偿矩阵（按通道名显式声明顺序）</summary>
+          <p class="hint">通道集合必须与数据通道完全一致；缺通道/多通道返回 422，绝不按位置相乘。</p>
+          <input id="comp-label" placeholder="标签">
+          <textarea id="comp-channels" rows="1" placeholder='["FSC","SSC","CD45","CD4","CD8"]'></textarea>
+          <textarea id="comp-matrix" rows="6" placeholder="[[1,0,0,0,0],...]"></textarea>
+          <label><input type="checkbox" id="comp-activate" checked> 创建并切换</label>
+          <button id="btn-comp-add">新建补偿版本</button>
+        </details>
+      </div>
+      <div>
+        <h3>仪器变换版本</h3>
+        <div id="trans-list"></div>
+        <details><summary>新建变换版本</summary>
+          <input id="trans-label" placeholder="标签">
+          <textarea id="trans-params" rows="6" placeholder='{"FSC":{"kind":"linear","scale":1}}'></textarea>
+          <label><input type="checkbox" id="trans-activate" checked> 创建并切换</label>
+          <button id="btn-trans-add">新建变换版本</button>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="edit-panel">
+    <h2>修正多边形门</h2>
+    <div class="controls">
+      <label>门 <select id="sel-edit-gate"></select></label>
+      <button id="btn-load-version">载入当前顶点</button>
+      <button id="btn-history">查看该门版本…</button>
+    </div>
+    <p class="hint">编辑 [[x,y],…] 后提交新版本：本门旧运行变 superseded，下游旧子门运行立即 invalidated（不再显示旧数）。</p>
+    <textarea id="edit-vertices" rows="5"></textarea>
+    <input id="edit-label" placeholder="版本标签（可选）">
+    <button id="btn-save-version" class="primary">提交新版本并重放受影响节点</button>
+    <div id="gate-version-list"></div>
+    <h3>新建门</h3>
+    <div class="controls">
+      <input id="new-id" placeholder="id（英文）">
+      <input id="new-label" placeholder="显示名">
+      <label>父 <select id="new-parent"></select></label>
+      <label>X <select id="new-x"></select></label>
+      <label>Y <select id="new-y"></select></label>
+    </div>
+    <textarea id="new-vertices" rows="3" placeholder="[[x,y],[x,y],[x,y],...]"></textarea>
+    <button id="btn-new-gate">创建门</button>
+  </section>
+
+  <section class="panel" id="diff-panel">
+    <h2>分支差异（按事件身份）</h2>
+    <div class="controls">
+      <label>运行 A <select id="diff-a"></select></label>
+      <label>运行 B <select id="diff-b"></select></label>
+      <button id="btn-diff">比较进出</button>
+    </div>
+    <div id="diff-result"></div>
+  </section>
+
+  <section class="panel" id="io-panel">
+    <h2>运行记录导出 / 清空重导入复核</h2>
+    <div class="controls">
+      <button id="btn-export">导出运行记录 JSON</button>
+      <button id="btn-verify">重算复核当前数据库</button>
+      <button id="btn-reseed">清空并重播种 fixture</button>
+      <label class="file">选择导出文件重导入 <input type="file" id="import-file" accept="application/json"></label>
+    </div>
+    <div id="io-result"></div>
+  </section>
+</main>
+
+<div id="toast"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
